@@ -1,31 +1,52 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.8.1-adoptopenjdk-11'
+  agent {
+    docker {
+      image 'maven:3.8.1-adoptopenjdk-11'
+    }
+  }
+  tools {
+    maven 'maven-3.6.3'
+  }
+  options {
+    skipStagesAfterUnstable()
+  }
+  environment {
+	DATE = new Date().format('yy.M')
+	TAG = "${DATE}.${BUILD_NUMBER}"
+    }
+  stages {
+    stage('Clone repository') {
+      steps {
+        script {
+          checkout scm
         }
+      }
     }
-    tools {
-        maven 'maven-3.6.3' 
-    }
-    options {
-        skipStagesAfterUnstable()
-    }
-    stages {
-         stage('Clone repository') {
-            steps {
-                script{
-                checkout scm
-                }
-            }
+    stage('Build') {
+      steps {
+        withMaven {
+          sh "echo 'hi from: ' \$(hostname)"
+          sh "mvn clean package"
+          sh "mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)"
         }
-
-        stage('Build') {
-            steps {
-	    		withMaven {
-	    			sh "echo 'hi from: ' \$(hostname)"
-	    			sh "mvn clean package"
-	    		}
-	    	}
+      }
+	}    
+	stage('Docker Build') {
+	  steps {
+		script {
+		  docker.build("echo_java:${TAG}")
         }
+      }
     }
+    stage('Deploy') {
+      steps {
+        script {
+          docker.withRegistry('https://580044464645.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:aws-credentials') {
+            app.push("${env.BUILD_NUMBER}")
+            app.push("latest")
+          }
+        }
+      }
+    }
+  }
 }
