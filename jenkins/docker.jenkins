@@ -21,9 +21,10 @@ pipeline {
 
         stage('Build') {
             steps {
-				withMaven {
-					sh "mvn clean package -Dmaven.test.skip=true"
-				}
+	    	withMaven {
+		sh "echo 'hi from: ' $(hostname)"
+		sh "mvn clean package -Dmaven.test.skip=true"
+		}
             }
         }
     }
