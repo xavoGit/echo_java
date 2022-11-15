@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'aws_agent01' }
     tools {
         maven 'maven-3.6.3' 
     }
