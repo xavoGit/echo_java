@@ -23,7 +23,7 @@ pipeline {
             steps {
 	    		withMaven {
 	    			sh "echo 'hi from: ' \$(hostname)"
-	    			sh "mvn clean package -Dmaven.test.skip=true"
+	    			sh "mvn clean package"
 	    		}
 	    	}
         }
