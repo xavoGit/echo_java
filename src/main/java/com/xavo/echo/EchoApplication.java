@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
 @RestController
-public class Application {
+public class EchoApplication {
 
   @RequestMapping("/")
   public String home() throws UnknownHostException {
@@ -18,7 +18,7 @@ public class Application {
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(Application.class, args);
+    SpringApplication.run(EchoApplication.class, args);
   }
 
 }
