@@ -30,7 +30,7 @@ pipeline {
 	stage('Docker Build') {
 	  steps {
 		script {
-		  docker.build("echo_java:${TAG}")
+		  app = docker.build("echo_java:${TAG}")
         }
       }
     }
