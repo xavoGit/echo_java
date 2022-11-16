@@ -1,9 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'maven:3.8.1-adoptopenjdk-11'
-    }
-  }
+  agent { label 'default' }
   tools {
     maven 'maven-3.6.3'
   }
@@ -13,27 +9,6 @@ pipeline {
   environment {
 	DATE = new Date().format('yy.M')
 	TAG = "${DATE}.${BUILD_NUMBER}"
-    }
-    
-  stages {
-    stage('Get Docker') {
-      steps {
-        script {
-	apt-get update && \
-	apt-get -y install apt-transport-https \
-	ca-certificates \
-	curl \
-	gnupg2 \
-     	software-properties-common && \
-	curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg > /tmp/dkey; apt-key add /tmp/dkey && \
-	add-apt-repository \
-   	"deb [arch=amd64] https://download.docker.com/linux/$(. /etc/os-release; echo "$ID") \
-   	$(lsb_release -cs) \
-   	stable" && \
-	apt-get update && \
-	apt-get -y install docker-ce
-      }
-      }
     }
   stages {
     stage('Clone repository') {
