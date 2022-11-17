@@ -14,7 +14,7 @@ public class EchoApplication {
 
   @RequestMapping("/")
   public String home() throws UnknownHostException {
-    return "Hello Docker World: v2.0" + InetAddress.getLocalHost();
+    return "Hello Docker World: v2.0" + InetAddress.getLocalHost() +"\nss";
   }
 
   public static void main(String[] args) {
