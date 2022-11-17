@@ -1,9 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'maven:3.8.1-adoptopenjdk-11'
-    }
-  }
+  agent { label 'default' }
   tools {
     maven 'maven-3.6.3'
   }
@@ -25,7 +21,7 @@ pipeline {
     stage('Build') {
       steps {
         withMaven {
-          sh "echo 'hi from: ' \$(hostname)"
+          sh "echo 'building from: ' \$(hostname)"
           sh "mvn clean package"
           sh "mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)"
         }
@@ -48,5 +44,9 @@ pipeline {
         }
       }
     }
+    stage('Trigger ManifestUpdate') {
+	  echo "triggering echo_java_updatemanifestjob"
+	  build job: 'echo_java_updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+	}
   }
 }
