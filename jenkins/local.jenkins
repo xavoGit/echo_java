@@ -22,7 +22,7 @@ pipeline {
       steps {
         withMaven {
           sh "echo 'building from: ' \$(hostname)"
-          sh "mvn clean package"
+          sh "mvn clean package -Dmaven.test.failure.ignore=true"
           sh "mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)"
         }
       }
@@ -50,5 +50,10 @@ pipeline {
 	    build job: 'echo_java_updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]  
       }
 	}
+  }
+  post {
+    always {
+      junit(testResults: 'target/surefire-reports/*.xml', allowEmptyResults : true)
+    }
   }
 }
