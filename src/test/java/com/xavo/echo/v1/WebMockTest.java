@@ -1,4 +1,4 @@
-package com.xavo.echo;
+package com.xavo.echo.v1;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.xavo.echo.v1.GreetingController;
+import com.xavo.echo.v1.GreetingService;
 
 @WebMvcTest(GreetingController.class)
 public class WebMockTest {

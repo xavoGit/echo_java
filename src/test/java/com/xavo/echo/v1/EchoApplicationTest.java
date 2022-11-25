@@ -1,4 +1,4 @@
-package com.xavo.echo;
+package com.xavo.echo.v1;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;

@@ -1,4 +1,4 @@
-package com.xavo.echo;
+package com.xavo.echo.v1;
 
 import org.springframework.stereotype.Service;
 
