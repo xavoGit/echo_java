@@ -28,29 +28,6 @@ pipeline {
         }
       }
 	}    
-	stage('Docker Build') {
-	  steps {
-		script {
-		  app = docker.build("echo_java:${TAG}")
-        }
-      }
-    }
-    stage('Deploy') {
-      steps {
-        script {
-          docker.withRegistry('https://580044464645.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:aws-credentials') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
-          }
-        }
-      }
-    }
-    stage('Trigger ManifestUpdate') {
-      steps{
-	    echo "triggering echo_java_updatemanifestjob"
-	    build job: 'echo_java_updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]  
-      }
-	}
   }
   post {
     always {
