@@ -1,32 +1,60 @@
 pipeline {
-  //agent { label 'default' }
+    //agent { label 'default' }
     agent any
-  /*tools {
-    maven 'maven-3.6.3'
-  }*/
-  options {
-    skipStagesAfterUnstable()
-  }
-  environment {
-	DATE = new Date().format('yy.M')
-	TAG = "${DATE}.${BUILD_NUMBER}"
+    /*tools {
+      maven 'maven-3.6.3'
+    }*/
+    options {
+        skipStagesAfterUnstable()
     }
-  stages {
-    stage('Clone repository') {
-      steps {
-        script {
-          checkout scm
-        }
-      }
+    environment {
+        DATE = new Date().format('yy.M')
+        TAG = "${DATE}.${BUILD_NUMBER}"
     }
-    stage('Build') {
-      steps {
-        withMaven {
-          sh "echo 'building from: ' \$(hostname)"
-          sh "mvn clean package -Dmaven.test.failure.ignore=true"
-          sh "mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)"
+    stages {
+        stage('Clone repository') {
+            steps {
+                script {
+                    checkout scm
+                }
+            }
         }
-      }
-	}    
-  }
+        stage('Build') {
+            steps {
+                withMaven {
+                    sh "echo 'building from: ' \$(hostname)"
+                    sh "mvn clean package -Dmaven.test.failure.ignore=true"
+                    sh "mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)"
+                }
+            }
+        }
+        stage('Docker Build') {
+            steps {
+                script {
+                    app = docker.build("echo_java:${TAG}")
+                }
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    docker.withRegistry('https://580044464645.dkr.ecr.us-east-1.amazonaws.com', 'ecr:us-east-1:aws-credentials') {
+                        app.push("${env.BUILD_NUMBER}")
+                        app.push("latest")
+                    }
+                }
+            }
+        }
+        stage('Trigger ManifestUpdate') {
+            steps {
+                echo "triggering echo_java_updatemanifestjob"
+                build job: 'echo_java_updatemanifest', parameters: [string(name: 'DOCKERTAG', value: env.BUILD_NUMBER)]
+            }
+        }
+    }
+    post {
+        always {
+            junit(testResults: 'target/surefire-reports/*.xml', allowEmptyResults: true)
+        }
+    }
 }
